@@ -1,0 +1,11 @@
+build:
+  version: "v2"
+
+accounts:
+  message: "accounts related qa APIs "
+  contactDetails:
+    name: "aravind kumar - qa Owner"
+    email: "aravind@in.com"
+  onCallSupport:
+    - (453) 392-4829
+    - (236) 203-0384

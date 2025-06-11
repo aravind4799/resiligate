@@ -1,0 +1,11 @@
+build:
+  version: "4.0"
+
+loans:
+  message: "Welcome to  loans related prod APIs "
+  contactDetails:
+    name: "aravind - Product Owner"
+    email: "aravind@ince.com"
+  onCallSupport:
+    - (723) 656-8709
+    - (156) 342-0956

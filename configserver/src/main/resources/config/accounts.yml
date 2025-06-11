@@ -1,0 +1,11 @@
+build:
+  version: "v3"
+
+accounts:
+  message: "Welcome accounts related  APIs "
+  contactDetails:
+    name: "John Deer - Developer"
+    email: "john@deer.com"
+  onCallSupport:
+    - (555) 555-1234
+    - (555) 523-1345
