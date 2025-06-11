@@ -6,26 +6,55 @@ spring:
   profiles:
     active: "prod"
   datasource:
-    url: jdbc:mysql://localhost:3306/accountsdb
-    username: root
-    password: root
-  sql:
-    init:
-      mode: always
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ''
+  h2:
+    console:
+      enabled: true
+
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
+    hibernate:
+      ddl-auto: update
 
   config:
     import: "optional:configserver:http://localhost:8071/"
 
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-
 management:
+#  this is to enable management related information
   endpoints:
     web:
       exposure:
         include: "*"
+  #this is to enable actuator information - env related information
+  info:
+    env:
+      enabled: true
+  #this is to enable actuator information - to expose shutdown endpoint which allows to graceful shutdown accounts ms
+  endpoint:
+    shutdown:
+      access: unrestricted
+
+
+
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+#for eureka dashboard - info related information - these info related information can be captured by actuator.
+info:
+  app:
+    name: "accounts"
+    description: "Accounts Microservice"
+    version: "1.0.0"

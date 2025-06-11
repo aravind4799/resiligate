@@ -6,25 +6,46 @@ spring:
     profiles:
         active: "prod"
     datasource:
-        url: jdbc:mysql://localhost:3307/loansdb
-        username: root
-        password: root
-    sql:
-        init:
-            mode: always
-    jpa:
-        show-sql: true
+        url: jdbc:h2:mem:testdb
+        driverClassName: org.h2.Driver
+        username: sa
+        password: ''
+    h2:
+        console:
+            enabled: true
 
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        show-sql: true
+        hibernate:
+            ddl-auto: update
     config:
         import: "optional:configserver:http://localhost:8071/"
-    rabbitmq:
-        host: localhost
-        port: 5672
-        username: guest
-        password: guest
+
 
 management:
     endpoints:
         web:
-           exposure:
-              include: "*"
+            exposure:
+                include: "*"
+    info:
+        env:
+            enabled: true
+    endpoint:
+        shutdown:
+            access: unrestricted
+
+eureka:
+    instance:
+        prefer-ip-address: true
+    client:
+        register-with-eureka: true
+        fetch-registry: true
+        service-url:
+            defaultZone: http://localhost:8070/eureka
+
+info:
+    app:
+        name: "loans"
+        description: "loans Microservice"
+        version: "1.0.0"

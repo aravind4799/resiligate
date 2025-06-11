@@ -11,19 +11,14 @@ spring:
     config:
       server:
 #        native:
-#          search-locations: "classpath:/config"
-#           search-locations: "file:///C://config/"
+        ##          search-locations: "classpath:/config"
+        ##           search-locations: "file:///C://config/"
         git:
           uri: "https://github.com/aravind4799/Config.git"
           default-label: "main"
           timeout: 5000
           clone-on-start: true
           force-pull: true
-    rabbitmq:
-      host: localhost
-      port: 5672
-      username: guest
-      password: guest
 
 management:
   endpoints:
