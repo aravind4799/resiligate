@@ -71,7 +71,7 @@
 				<version>3.4.5</version>
 				<configuration>
 					<to>
-						<image>aravind4799/${project.artifactId}:v3</image>
+						<image>aravind4799/${project.artifactId}:v5</image>
 					</to>
 				</configuration>
 			</plugin>

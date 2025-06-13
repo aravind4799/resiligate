@@ -1,6 +1,19 @@
 services:
+
+  redis:
+    image: "redis"
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      timeout: 10s
+      retries: 10
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
   eurekaserver:
-    image: "aravind4799/eurekaserver:v3"
+    image: "aravind4799/eurekaserver:v5"
     container_name: "eurekaserver-ms-container"
     depends_on:
       configserver:
@@ -20,7 +33,7 @@ services:
       service: microservice-configserver-config
 
   configserver:
-    image: "aravind4799/configserver:v3"
+    image: "aravind4799/configserver:v5"
     container_name: "configserver-ms-container"
     healthcheck:
       test: "curl --fail --silent http://localhost:8071/actuator/health/readiness | grep UP || exit 1"
@@ -35,10 +48,16 @@ services:
       service: microservice-base-config
 
   accounts:
-    image: "aravind4799/accounts:v3"
+    image: "aravind4799/accounts:v5"
     container_name: "accounts-ms-container"
     ports:
       - "8080:8080"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_interval: 10s
     depends_on:
       configserver:
         condition: service_healthy
@@ -51,7 +70,7 @@ services:
       service: microservice-eurekaserver-config
 
   loans:
-    image: "aravind4799/loans:v3"
+    image: "aravind4799/loans:v5"
     container_name: "loans-ms-container"
     depends_on:
       configserver:
@@ -60,6 +79,12 @@ services:
         condition: service_healthy
     ports:
       - "8090:8090"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8090/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_interval: 10s
     environment:
       SPRING_APPLICATION_NAME: "loans"
     extends:
@@ -67,7 +92,7 @@ services:
       service: microservice-eurekaserver-config
 
   cards:
-    image: "aravind4799/cards:v3"
+    image: "aravind4799/cards:v5"
     container_name: "cards-ms-container"
     depends_on:
       configserver:
@@ -76,8 +101,42 @@ services:
         condition: service_healthy
     ports:
       - "9000:9000"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:9000/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_interval: 10s
     environment:
       SPRING_APPLICATION_NAME: "cards"
+    extends:
+      file: common-config.yml
+      service: microservice-eurekaserver-config
+
+  gatewayserver:
+    image: "aravind4799/gatewayserver:v5"
+    container_name: "gateway-ms-container"
+    depends_on:
+      configserver:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_healthy
+      loans:
+        condition: service_healthy
+      cards:
+        condition: service_healthy
+      accounts:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8072:8072"
+    environment:
+      SPRING_APPLICATION_NAME: "gatewayserver"
+      SPRING_DATA_REDIS_CONNECT-TIMEOUT: 2s
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_TIMEOUT: 1s
     extends:
       file: common-config.yml
       service: microservice-eurekaserver-config

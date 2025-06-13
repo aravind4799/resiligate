@@ -32,7 +32,15 @@ management:
   info:
     env:
       enabled: true
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
   endpoint:
+    health:
+      probes:
+        enabled: true
     shutdown:
       access: unrestricted
 
@@ -50,3 +58,9 @@ info:
     name: "cards"
     description: "Cards Microservice"
     version: "1.0.0"
+
+logging:
+  level:
+    com:
+      microservice:
+        accounts: DEBUG

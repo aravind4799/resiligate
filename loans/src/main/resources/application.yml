@@ -31,10 +31,17 @@ management:
     info:
         env:
             enabled: true
+    health:
+        readiness-state:
+            enabled: true
+        liveness-state:
+            enabled: true
     endpoint:
         shutdown:
             access: unrestricted
-
+        health:
+            probes:
+                enabled: true
 eureka:
     instance:
         prefer-ip-address: true
@@ -49,3 +56,9 @@ info:
         name: "loans"
         description: "loans Microservice"
         version: "1.0.0"
+
+logging:
+    level:
+        com:
+           microservice:
+                loans: DEBUG

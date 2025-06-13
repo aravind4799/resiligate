@@ -1,0 +1,57 @@
+spring:
+  data:
+    redis:
+      connection-timeout: 2s
+      host: localhost
+      port: 6379
+      timeout: 1s
+  application:
+    name: "gatewayserver"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      httpclient:
+        connectTimeout: 1000
+        responseTimeout: 5s
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: "gatewayserver"
+    description: "Gateway Server Application"
+    version: "1.0.0"
+
+logging:
+  level:
+    com:
+      microservice:
+        gatewayserver: DEBUG
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+#      atleast monitor for 10 req then take a call to switch from closed to open
+      slidingWindowSize: 10
+#      based on these 3 req it will switch back to open or closed
+      permittedNumberOfCallsInHalfOpenState: 3
+#      wait for 10s when ever it goes into half open state and allow traffic
+      waitDurationInOpenState: 10000
+#      if atleast 50 are failed then switch to open state from closed state
+      failureRateThreshold: 50
+
+

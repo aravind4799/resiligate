@@ -8,6 +8,8 @@ import com.microservices.cards.mapper.CardsMapper;
 import com.microservices.cards.repository.CardsRepository;
 import com.microservices.cards.service.ICardsService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.microservices.cards.dto.CardsDto;
 
@@ -19,6 +21,7 @@ import java.util.Random;
 public class CardsServiceImpl implements ICardsService {
 
     private CardsRepository cardsRepository;
+
 
     /**
      * @param mobileNumber - Mobile Number of the Customer

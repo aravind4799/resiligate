@@ -1,11 +1,12 @@
 package com.microservices.accounts.controller;
-
 import com.microservices.accounts.constants.AccountsConstants;
 import com.microservices.accounts.dto.AccountsContactInfoDto;
 import com.microservices.accounts.dto.CustomerDto;
 import com.microservices.accounts.dto.ErrorResponseDto;
 import com.microservices.accounts.dto.ResponseDto;
 import com.microservices.accounts.service.IAccountsService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,11 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -168,17 +165,31 @@ public class AccountsController {
 
 
     @GetMapping("/build-info")
+    @Retry(name ="getBuildInfo",fallbackMethod = "getBuildInfoFallback")
     public ResponseEntity<String> getBuildVersion() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(buildversion);
     }
 
+    public ResponseEntity<String> getBuildInfoFallback(Throwable throwable) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("0.9");
+    }
+
+    @RateLimiter(name = "getJavaVersion",fallbackMethod = "getJavaVersionFallback")
     @GetMapping("/java-version")
     public ResponseEntity<String> getJavaVersion() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(env.getProperty("JAVA_HOME"));
+    }
+
+    public ResponseEntity<String> getJavaVersionFallback(Throwable throwable) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("java version default: 21");
     }
 
     @GetMapping("/contact-info")

@@ -5,6 +5,10 @@ spring:
     name: "accounts"
   profiles:
     active: "prod"
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
   datasource:
     url: jdbc:h2:mem:testdb
     driverClassName: org.h2.Driver
@@ -34,13 +38,18 @@ management:
     env:
       enabled: true
   #this is to enable actuator information - to expose shutdown endpoint which allows to graceful shutdown accounts ms
+
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
   endpoint:
+    health:
+      probes:
+        enabled: true
     shutdown:
       access: unrestricted
-
-
-
-
 
 eureka:
   instance:
@@ -58,3 +67,46 @@ info:
     name: "accounts"
     description: "Accounts Microservice"
     version: "1.0.0"
+
+logging:
+  level:
+    com:
+      microservice:
+        accounts: DEBUG
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      #      atleast monitor for 10 req then take a call to switch from closed to open
+      slidingWindowSize: 10
+      #      based on these 3 req it will switch back to open or closed
+      permittedNumberOfCallsInHalfOpenState: 3
+      #      wait for 10s when ever it goes into half open state and allow traffic
+      waitDurationInOpenState: 10000
+      #      if atleast 50 are failed then switch to open state from closed state
+      failureRateThreshold: 50
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 3
+      waitDuration: 1000
+      enableExponentialBackoff: true
+      exponential-backoff-multiplier: 2
+    ignoredExceptions:
+        - java.lang.NullPointerException
+    retryExceptions:
+        - java.util.concurrent.TimeoutException
+
+
+resilience4j.ratelimiter:
+  configs:
+    default:
+      #  within 5 sec if we get another req, we wait for 1 sec , if rate limitor is not allowing the req then it will return with an error
+      timeoutDuration: 1000
+      #      refresh the quota for every 5 sec
+      limitRefreshPeriod: 5000
+      #      in every 5 sec allow 1 req : limit for period
+      limitForPeriod: 1
+
+      #with gateway server we can enforce this quota limition based on user , ip address or server using keyresolver, redisratelimiter and rediscache

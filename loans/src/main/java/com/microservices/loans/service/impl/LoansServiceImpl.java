@@ -32,6 +32,7 @@ public class LoansServiceImpl implements ILoansService {
 
     @Override
     public LoansDto fetchLoan(String mobileNumber) {
+        System.out.println("I got called with this mobileNumber: "+mobileNumber);
         Loans loans = loansRepository.findByMobileNumber(mobileNumber).orElseThrow(
                 () -> new ResourceNotFoundException("Loan", "mobileNumber", mobileNumber)
         );

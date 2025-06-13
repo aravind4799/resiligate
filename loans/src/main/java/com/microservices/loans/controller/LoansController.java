@@ -14,7 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @RestController
 @RequestMapping(path = "/loans/v1",produces = "application/json")
 @RequiredArgsConstructor
@@ -26,6 +27,8 @@ public class LoansController {
     private final LoansContactInfoDto loansContactInfoDto;
 
     private final Environment env;
+
+    private static final Logger logger = LoggerFactory.getLogger(LoansController.class);
 
     @Value("${build.version}")
     private String buildVersion;
@@ -44,9 +47,10 @@ public class LoansController {
     }
 
     @GetMapping("/fetch")
-    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestParam
+    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestHeader("microservice-correlation-id") String correlationId,@RequestParam
                                                      @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
                                                      String mobileNumber) {
+        logger.debug("microservice-correlation-id found:{}",correlationId);
         LoansDto loansDto = iLoansService.fetchLoan(mobileNumber);
         return ResponseEntity.status(HttpStatus.OK).body(loansDto);
     }
